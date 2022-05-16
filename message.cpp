@@ -4,7 +4,7 @@
 std::vector<bool> encode_message(std::string message) {
     std::vector<bool> encoded_message; // vector<bool> is a dynamic bitset
     // Reserge message bits, plus five for ending flag
-    encoded_message.reserve((message.size() * 8) + 5); // Due to bit stuffing, will be slightly under the total amount
+    encoded_message.reserve((message.size() * 8) + 8); // Due to bit stuffing, will be slightly under the total amount
     // insert bits from message
     for (char i : message) {
         CHAR_BITSET temp = i;
@@ -23,14 +23,14 @@ std::vector<bool> encode_message(std::string message) {
             temp_counter = 0;
         }
         // Insert a 0 to break up 5 1s in a row
-        if (temp_counter == 5) {
+        if (temp_counter == 8) {
             auto iter = encoded_message.begin() + i;
             encoded_message.insert(iter,false);
             temp_counter = 0;
         }
     }
     // Insert ending bits
-    for (size_t i = 0; i < 5; i++) {
+    for (size_t i = 0; i < 8; i++) {
         encoded_message.push_back(true);
     }
     return encoded_message;
@@ -79,21 +79,21 @@ png::image<png::rgb_pixel> insert_message(std::string message, std::string filen
 std::string decode_message(std::vector<bool> encoded_message) {
     std::string decoded_message;
     // Verify that bit stuffing was used
-    for (size_t i = 0; i < 5; i++) {
+    for (size_t i = 0; i < 8; i++) {
         if (encoded_message.at(encoded_message.size() - 1 - i) != true) {
             throw std::runtime_error("Invalid ending for encoded message");
         }
     }
     // Remove end flag
-    auto iter = encoded_message.end() - 5;
+    auto iter = encoded_message.end() - 8;
     encoded_message.erase(iter,encoded_message.end());
     // Remove stuffed bits
-    size_t true_counter = 0;
+    size_t true_counter = 0; // number of 1s in a row
     for (size_t i = 0; i < encoded_message.size(); i++) {
         if (encoded_message.at(i) == true) {
             true_counter++;
         }
-        else if (true_counter == 4 && encoded_message.at(i) == false) {
+        else if (true_counter == 7 && encoded_message.at(i) == false) {
             iter = encoded_message.begin() + i;
             encoded_message.erase(iter);
             i--;
@@ -136,7 +136,7 @@ std::string get_message(std::string filename) {
                     counter = 0;
                 }
                 encoded_message.push_back(temp);
-                if (counter == 5) {
+                if (counter == 8) {
                     return decode_message(encoded_message);
                 }
                 temp = pixel.green & 1;
@@ -147,7 +147,7 @@ std::string get_message(std::string filename) {
                     counter = 0;
                 }
                 encoded_message.push_back(temp);
-                if (counter == 5) {
+                if (counter == 8) {
                     return decode_message(encoded_message);
                 }
                 temp = pixel.blue & 1;
@@ -158,7 +158,7 @@ std::string get_message(std::string filename) {
                     counter = 0;
                 }
                 encoded_message.push_back(temp);
-                if (counter == 5) {
+                if (counter == 8) {
                     return decode_message(encoded_message);
                 }
             }

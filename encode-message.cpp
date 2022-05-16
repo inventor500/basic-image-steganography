@@ -6,11 +6,15 @@
 
 int main(int argc, char* argv[]) {
     try {
-        if (argc != 3) {
+        if (argc == 1) {
+            std::cerr << "Usage: encode-message <message> <image>\n";
+            return 1;
+        }
+        else if (argc != 3) {
             throw std::runtime_error("Invalid number of arguments. Expected 2, got " + std::to_string(argc - 1));
         }
-        std::string image_filename = argv[1];
-        std::string message_filename = argv[2];
+        std::string image_filename = argv[2];
+        std::string message_filename = argv[1];
         if (!std::filesystem::exists(std::filesystem::path(image_filename))) {
             throw std::runtime_error("Image does not exist!");
         }

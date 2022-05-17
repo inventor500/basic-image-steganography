@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
         image.write(image_filename.substr(0, image_filename.length() - 4) + "_encoded.png");
     }
     catch (std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << "\033[1;31mError: " << e.what() << "\033[0;0m" << std::endl;
         return 1;
     }
     return 0;

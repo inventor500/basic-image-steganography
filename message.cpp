@@ -12,7 +12,7 @@ std::vector<bool> encode_message(std::string message) {
             encoded_message.push_back(temp[j]); // Space was already allocated
         }
     }
-    std::cout << "Beginning bit stuffing...\r";
+    std::cout << "\033[0;36mBeginning bit stuffing\033[0;0m...\r";
     // Bit stuffing
     int temp_counter = 0;
     for (size_t i = 0; i < encoded_message.size(); i++) {
@@ -44,7 +44,7 @@ png::image<png::rgb_pixel> insert_message(std::string message, std::string filen
         throw std::runtime_error("Message is too long for image");
     }
     size_t counter = 0;
-    std::cout << "Inserting message into image...\r";
+    std::cout << "\033[0;36mInserting message into image\033[0;0m...\r";
     while (true) {
         for (size_t y = 0; y < image.get_height(); y++) {
             for (size_t x = 0; x < image.get_width(); x++) {

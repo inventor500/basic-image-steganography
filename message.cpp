@@ -45,35 +45,34 @@ png::image<png::rgb_pixel> insert_message(std::string message, std::string filen
     }
     size_t counter = 0;
     std::cout << "\033[0;36mInserting message into image\033[0;0m...\r";
-    while (true) {
-        for (size_t y = 0; y < image.get_height(); y++) {
-            for (size_t x = 0; x < image.get_width(); x++) {
-                auto pixel = image[y][x];
-                pixel.red &= 0xE;
-                pixel.red |= encoded_message[counter];
-                counter++;
-                if (counter >= encoded_message.size()) {
-                    image[y][x] = pixel;
-                    return image;
-                }
-                pixel.green &= 0xE;
-                pixel.green |= encoded_message[counter];
-                counter++;
-                if (counter >= encoded_message.size()) {
-                    image[y][x] = pixel;
-                    return image;
-                }
-                pixel.blue &= 0xE;
-                pixel.blue |= encoded_message[counter];
-                counter++;
-                if (counter >= encoded_message.size()) {
-                    image[y][x] = pixel;
-                    return image;
-                }
+    for (size_t y = 0; y < image.get_height(); y++) {
+        for (size_t x = 0; x < image.get_width(); x++) {
+            auto pixel = image[y][x];
+            pixel.red &= 0xE;
+            pixel.red |= encoded_message[counter];
+            counter++;
+            if (counter >= encoded_message.size()) {
                 image[y][x] = pixel;
+                return image;
             }
+            pixel.green &= 0xE;
+            pixel.green |= encoded_message[counter];
+            counter++;
+            if (counter >= encoded_message.size()) {
+                image[y][x] = pixel;
+                return image;
+            }
+            pixel.blue &= 0xE;
+            pixel.blue |= encoded_message[counter];
+            counter++;
+            if (counter >= encoded_message.size()) {
+                image[y][x] = pixel;
+                return image;
+            }
+            image[y][x] = pixel;
         }
     }
+    throw std::runtime_error("Message is too long for image");
 }
 
 std::string decode_message(std::vector<bool> encoded_message) {
@@ -123,45 +122,44 @@ std::string get_message(std::string filename) {
     int counter = 0;
     png::image<png::rgb_pixel> image(filename);
     std::vector<bool> encoded_message;
-    while (true) {
-        for (size_t y = 0; y < image.get_height(); y++) {
-            for (size_t x = 0; x < image.get_width(); x++) {
-                auto pixel = image[y][x];
-                bool temp;
-                temp = pixel.red & 1;
-                if (temp == true) {
-                    counter++;
-                }
-                else {
-                    counter = 0;
-                }
-                encoded_message.push_back(temp);
-                if (counter == 8) {
-                    return decode_message(encoded_message);
-                }
-                temp = pixel.green & 1;
-                if (temp == true) {
-                    counter++;
-                }
-                else {
-                    counter = 0;
-                }
-                encoded_message.push_back(temp);
-                if (counter == 8) {
-                    return decode_message(encoded_message);
-                }
-                temp = pixel.blue & 1;
-                if (temp == true) {
-                    counter++;
-                }
-                else {
-                    counter = 0;
-                }
-                encoded_message.push_back(temp);
-                if (counter == 8) {
-                    return decode_message(encoded_message);
-                }
+    for (size_t y = 0; y < image.get_height(); y++) {
+        for (size_t x = 0; x < image.get_width(); x++) {
+            auto pixel = image[y][x];
+            bool temp;
+            temp = pixel.red & 1;
+            if (temp == true) {
+                counter++;
+            }
+            else {
+                counter = 0;
+            }
+            encoded_message.push_back(temp);
+            if (counter == 8) {
+                return decode_message(encoded_message);
+            }
+            temp = pixel.green & 1;
+            if (temp == true) {
+                counter++;
+            }
+            else {
+                counter = 0;
+            }
+            encoded_message.push_back(temp);
+            if (counter == 8) {
+                return decode_message(encoded_message);
+            }
+            temp = pixel.blue & 1;
+            if (temp == true) {
+                counter++;
+            }
+            else {
+                counter = 0;
+            }
+            encoded_message.push_back(temp);
+            if (counter == 8) {
+                return decode_message(encoded_message);
             }
         }
     }
+    throw std::runtime_error("Reached end of file without finding message terminating characters");
 }
